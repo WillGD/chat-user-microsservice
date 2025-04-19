@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # Microsserviço de Chat
+  chat:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Caminho para o Dockerfile do chat
+    image: chat-service:latest
+    container_name: chat-service
+    ports:
+      - "8081:8080"  # Mapeando a porta 8081 da máquina local para a porta 8080 do container
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://chat-db:5432/chatdb  # URL do PostgreSQL
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - chat-db  # Dependência do banco de dados PostgreSQL para o chat
+
+  # Microsserviço de Usuário
+  user:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Caminho para o Dockerfile do user
+    image: user-service:latest
+    container_name: user-service
+    ports:
+      - "8082:8080"  # Mapeando a porta 8082 da máquina local para a porta 8080 do container
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://user-db:3306/userdb  # URL do MySQL
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    depends_on:
+      - user-db  # Dependência do banco de dados MySQL para o usuário
+
+  # Banco de Dados para o Chat (PostgreSQL)
+  chat-db:
+    image: postgres:13
+    container_name: chat-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: chatdb
+    ports:
+      - "5432:5432"  # Mapeando a porta do PostgreSQL
+    volumes:
+      - chat-db-data:/var/lib/postgresql/data
+
+  # Banco de Dados para o Usuário (MySQL)
+  user-db:
+    image: mysql:8
+    container_name: user-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: userdb
+    ports:
+      - "3306:3306"  # Mapeando a porta do MySQL
+    volumes:
+      - user-db-data:/var/lib/mysql
+
+volumes:
+  chat-db-data:
+  user-db-data:

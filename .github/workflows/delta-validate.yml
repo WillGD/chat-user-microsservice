@@ -1,0 +1,68 @@
+name: Delta CI - JUnit Coverage Only
+
+on:
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      chat: ${{ steps.filter.outputs.chat }}
+      user: ${{ steps.filter.outputs.user }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect changed services
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            chat:
+              - 'chat-service/**'
+            user:
+              - 'user-service/**'
+
+  test-chat:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.chat == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Run JUnit tests and generate coverage
+        run: ./gradlew :chat-service:test :chat-service:jacocoTestReport
+
+      - name: Upload coverage report as artifact (chat)
+        uses: actions/upload-artifact@v4
+        with:
+          name: chat-coverage-report
+          path: chat-service/build/reports/jacoco/test/html
+
+  test-user:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.user == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Run JUnit tests and generate coverage
+        run: ./gradlew :user-service:test :user-service:jacocoTestReport
+
+      - name: Upload coverage report as artifact (user)
+        uses: actions/upload-artifact@v4
+        with:
+          name: user-coverage-report
+          path: user-service/build/reports/jacoco/test/html

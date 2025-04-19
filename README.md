@@ -33,10 +33,10 @@ Esta aplicação é um sistema baseado em **microsserviços** utilizando **Java 
 
 Antes de executar a aplicação, certifique-se de ter os seguintes pré-requisitos instalados em sua máquina:
 
-- **Java 17**
+- **Java 17** ou superior
 - **Docker** e **Docker Compose**
-- **Maven** 
-- **IDE** (como IntelliJ IDEA & VSCode.)
+- **Maven** ou **Gradle** (dependendo da sua escolha)
+- **IDE** (como IntelliJ IDEA, VSCode, Eclipse, etc.)
 
 ---
 
