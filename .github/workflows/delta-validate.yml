@@ -19,9 +19,9 @@ jobs:
         with:
           filters: |
             chat:
-              - 'chat-service/**'
+              - 'src/main/java/chatapp/chat_user_microsservice/chat/**'
             user:
-              - 'user-service/**'
+             - 'src/main/java/chatapp/chat_user_microsservice/user/**'
 
   test-chat:
     needs: detect-changes
